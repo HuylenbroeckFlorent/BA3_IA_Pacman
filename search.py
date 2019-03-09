@@ -91,7 +91,6 @@ def depthFirstSearch(problem):
     stack.push(problem.getStartState())
     explored = util.Stack()
     movements = []
-    finished = False
     parent = stack.pop()
     successors = problem.getSuccessors(parent)
     explored.push(parent)
@@ -116,11 +115,6 @@ def depthFirstSearch(problem):
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
-    print("Start:"+str(problem.getStartState()))
-    print("Is the start a goal?"+str(problem.isGoalState(problem.getStartState())))
-    print("Start's successors:"+str(problem.getSuccessors(problem.getStartState())))
-    util.raiseNotDefined()
-    #return movements
 
 class Node:
     def __init__(self, state, direction, parent = None):
@@ -159,10 +153,35 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     queue = util.Queue()
     queue.push(problem.getStartState())
+    states = util.Queue()
     movements = []
-
+    parent = queue.pop()
+    successors = problem.getSuccessors(parent)
     explored = util.Queue()
-
+    explored.push(parent)
+    for s in successors:
+        node = Node(s[0],s[1])
+        states.push(s[0])
+        queue.push(node)
+    while not queue.isEmpty():
+        parent = queue.pop()
+        state = parent.getState()
+        if problem.isGoalState(state):
+            break
+        successors = problem.getSuccessors(state)
+        explored.push(state)
+        for s in successors:
+            node = Node(s[0],s[1],parent)
+            if (not s[0] in states.list) and (not s[0] in explored.list):
+                states.push(s[0])
+                queue.push(node)
+    moves = util.Stack()
+    while not parent == None:
+        moves.push(parent.getDir())
+        parent = parent.getParent()
+    while not moves.isEmpty():
+        movements.append(moves.pop())
+    return movements
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
