@@ -92,29 +92,52 @@ def depthFirstSearch(problem):
     explored = util.Stack()
     movements = []
     finished = False
+    parent = stack.pop()
+    successors = problem.getSuccessors(parent)
+    explored.push(parent)
+    for s in successors:
+        node = Node(state = s[0],direction=s[1],parent = None)
+        stack.push(node)
     while not stack.isEmpty():
-        print(stack.list)
-        if finished:
+        parent = stack.pop()
+        state = parent.getState()
+        if problem.isGoalState(state):
             break
-        succ = stack.pop()
-        explored.push(succ)
-        next = problem.getSuccessors(succ)
+        explored.push(state)
+        next = problem.getSuccessors(state)
         for s in next:
             if (s[0] not in stack.list) and (s[0] not in explored.list):
-                stack.push(s[0])
+                node = Node(s[0],s[1],parent)
+                stack.push(node)
+    moves = util.Stack()
+    while not parent == None:
+        moves.push(parent.getDir())
+        parent = parent.getParent()
+    while not moves.isEmpty():
+        movements.append(moves.pop())
+    return movements
     print("Start:"+str(problem.getStartState()))
     print("Is the start a goal?"+str(problem.isGoalState(problem.getStartState())))
     print("Start's successors:"+str(problem.getSuccessors(problem.getStartState())))
     util.raiseNotDefined()
     #return movements
 
-def canMoveTo(successor,problem,explored):
-    can = True
-    if len(successor)==1:
-        can = problem.getSuccessors(successor)[0] not in explored
-    return can
+class Node:
+    def __init__(self, state, direction, parent = None):
+        self.state = state
+        self.direction = direction
+        self.parent = parent
 
-def getDirection(successor):
+    def getState(self):
+        return self.state
+
+    def getDir(self):
+        return self.direction
+
+    def getParent(self):
+        return self.parent
+
+"""def getDirection(successor):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
@@ -127,13 +150,19 @@ def getDirection(successor):
     elif successor[1]=='East':
         return e
     else:
-        return w
+        return w"""
 
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    queue = util.Queue()
+    queue.push(problem.getStartState())
+    movements = []
+
+    explored = util.Queue()
+
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
