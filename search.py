@@ -95,11 +95,11 @@ def depthFirstSearch(problem):
     successors = problem.getSuccessors(parent)
     explored.push(parent)
     for s in successors:
-        node = Node(state = s[0],direction=s[1],parent = None)
+        node = Node(state = s[0],direction=s[1])
         stack.push(node)
     while not stack.isEmpty():
         parent = stack.pop()
-        state = parent.getState()
+        state = parent.state
         if problem.isGoalState(state):
             break
         explored.push(state)
@@ -110,26 +110,25 @@ def depthFirstSearch(problem):
                 stack.push(node)
     moves = util.Stack()
     while not parent == None:
-        moves.push(parent.getDir())
-        parent = parent.getParent()
+        moves.push(parent.direction)
+        parent = parent.parent
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
 
 class Node:
-    def __init__(self, state, direction, parent = None):
+    def __init__(self, state, direction,parent = None):
         self.state = state
         self.direction = direction
         self.parent = parent
 
-    def getState(self):
-        return self.state
+class WeightedNode(Node):
+    def __init__(self, state, direction, parent = None,stepCost = 0):
+        self.state = state
+        self.direction = direction
+        self.parent = parent
+        self.weight = parent.weight + stepCost
 
-    def getDir(self):
-        return self.direction
-
-    def getParent(self):
-        return self.parent
 
 """def getDirection(successor):
     from game import Directions
@@ -165,7 +164,7 @@ def breadthFirstSearch(problem):
         queue.push(node)
     while not queue.isEmpty():
         parent = queue.pop()
-        state = parent.getState()
+        state = parent.state
         if problem.isGoalState(state):
             break
         successors = problem.getSuccessors(state)
@@ -177,8 +176,8 @@ def breadthFirstSearch(problem):
                 queue.push(node)
     moves = util.Stack()
     while not parent == None:
-        moves.push(parent.getDir())
-        parent = parent.getParent()
+        moves.push(parent.direction)
+        parent = parent.parent
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
@@ -187,6 +186,38 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    frontier = util.PriorityQueue()
+    node = Node(problem.getStartState(),None,None)
+    node.weight = 0
+    frontier.push(node,0)
+    movements = []
+    states = []
+    explored = []
+    start = Node(None,None)
+    parent = frontier.pop()
+    explored.append(parent.state)
+    for s in problem.getSuccessors(parent.state):
+        node = WeightedNode(s[0],s[1],parent,s[2])
+        states.append(s[0])
+        frontier.update(node,s[2])
+    while not frontier.isEmpty():
+        parent = frontier.pop()
+        if problem.isGoalState(parent.state):
+            start = parent
+            break
+        explored.append(parent.state)
+        for s in problem.getSuccessors(parent.state):
+            child = WeightedNode(s[0],s[1],parent,s[2])
+            if (not child.state in explored) and (not child.state in states):
+                frontier.update(child,child.weight)
+                states.append(s[0])
+    moves = util.Stack()
+    while start.direction != None:
+        moves.push(start.direction)
+        start = start.parent
+    while not moves.isEmpty():
+        movements.append(moves.pop())
+    return movements
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -199,6 +230,8 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    frontier = util.PriorityQueue()
+    
     util.raiseNotDefined()
 
 
