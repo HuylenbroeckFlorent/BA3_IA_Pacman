@@ -72,6 +72,16 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+class Node:
+    def __init__(self, state, direction,parent = None):
+        self.state = state
+        self.direction = direction
+        self.parent = parent
+    def __str__(self):
+        return str(self.state)
+    def __repr__(self):
+        return self.__str__()
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -88,82 +98,61 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     stack = util.Stack()
-    stack.push(problem.getStartState())
-    explored = util.Stack()
+    node = Node(problem.getStartState(),None)
+    stack.push(node)
+    explored = []
     movements = []
-    parent = stack.pop()
-    successors = problem.getSuccessors(parent)
-    explored.push(parent)
-    for s in successors:
-        node = Node(state = s[0],direction=s[1])
-        stack.push(node)
+    start = Node(None,None)
     while not stack.isEmpty():
         parent = stack.pop()
-        state = parent.state
-        if problem.isGoalState(state):
-            break
-        explored.push(state)
-        next = problem.getSuccessors(state)
-        for s in next:
-            if (s[0] not in stack.list) and (s[0] not in explored.list):
-                node = Node(s[0],s[1],parent)
-                stack.push(node)
+        if parent.state not in explored:
+            if problem.isGoalState(parent.state):
+                start = parent
+                break
+            explored.append(parent.state)
+            next = problem.getSuccessors(parent.state)
+            for s in next:
+                child = Node(s[0],s[1],parent)
+                if (child not in stack.list) and (s[0] not in explored):
+                    stack.push(child)
     moves = util.Stack()
-    while not parent == None:
-        moves.push(parent.direction)
-        parent = parent.parent
+    while not start.parent == None:
+        moves.push(start.direction)
+        start = start.parent
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
-
-class Node:
-    def __init__(self, state, direction,parent = None):
-        self.state = state
-        self.direction = direction
-        self.parent = parent
-    def __str__(self):
-        return str(self.state)
-    def __repr__(self):
-        return self.__str__()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     queue = util.Queue()
-    queue.push(problem.getStartState())
-    states = util.Queue()
+    node = Node(problem.getStartState(),None)
+    queue.push(node)
     movements = []
-    parent = queue.pop()
-    successors = problem.getSuccessors(parent)
-    explored = util.Queue()
-    explored.push(parent)
-    for s in successors:
-        node = Node(s[0],s[1])
-        states.push(s[0])
-        queue.push(node)
+    explored = []
+    start = Node(None,None)
     while not queue.isEmpty():
         parent = queue.pop()
-        state = parent.state
-        if problem.isGoalState(state):
-            break
-        successors = problem.getSuccessors(state)
-        explored.push(state)
-        for s in successors:
-            node = Node(s[0],s[1],parent)
-            if (not s[0] in states.list) and (not s[0] in explored.list):
-                states.push(s[0])
-                queue.push(node)
+        if parent.state not in explored:
+            if problem.isGoalState(parent.state):
+                start = parent
+                break
+            explored.append(parent.state)
+            for s in problem.getSuccessors(parent.state):
+                node = Node(s[0],s[1],parent)
+                if (node not in queue.list) and (s[0] not in explored):
+                    queue.push(node)
     moves = util.Stack()
-    while not parent == None:
-        moves.push(parent.direction)
-        parent = parent.parent
+    while not start.parent == None:
+        moves.push(start.direction)
+        start = start.parent
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
-    util.raiseNotDefined()
 
 class WeightedNode(Node):
-    def __init__(self, state, direction, parent = None,stepCost = 0):
+    def __init__(self, state, direction, parent = None, stepCost = 0):
         self.state = state
         self.direction = direction
         self.parent = parent
@@ -178,12 +167,7 @@ def uniformCostSearch(problem):
     movements = []
     explored = []
     start = Node(None,None)
-    parent = node
-    explored.append(parent.state)
-    for s in problem.getSuccessors(parent.state):
-        node = WeightedNode(s[0],s[1],parent,s[2])
-        frontier.update(node,s[2])
-        print(frontier.heap)
+    frontier.update(node,node.weight)
     while not frontier.isEmpty():
         parent = frontier.pop()
         if not parent.state in explored:
@@ -202,7 +186,6 @@ def uniformCostSearch(problem):
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
-    #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -229,12 +212,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     movements = []
     start = Node(None,None)
     node.weight = 0
-    parent = node
-    explored.append(parent.state)
-    for s in problem.getSuccessors(parent.state):
-        w = heuristic(s[0],problem)
-        node = aStarNode(s[0],s[1],parent,s[2],w)
-        frontier.update(node,node.cost)
+    frontier.update(node,node.weight)
     while not frontier.isEmpty():
         parent = frontier.pop()
         if not parent.state in explored:
@@ -254,7 +232,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while not moves.isEmpty():
         movements.append(moves.pop())
     return movements
-    #util.raiseNotDefined()
 
 
 # Abbreviations
@@ -262,3 +239,16 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+"""parent = stack.pop()
+successors = problem.getSuccessors(parent)
+explored.push(parent)
+for s in successors:
+    node = Node(state = s[0],direction=s[1])
+    stack.push(node)
+
+UCS
+for s in problem.getSuccessors(parent.state):
+    node = WeightedNode(s[0],s[1],parent,s[2])
+    frontier.update(node,s[2])
+
+"""
