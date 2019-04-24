@@ -150,17 +150,15 @@ class ExactInference(InferenceModule):
 
         "*** YOUR CODE HERE ***"
         allPossible = util.Counter()
-        if noisyDistance == None:
-            for p in self.legalPositions:
+        # Replace this code with a correct observation update
+        # Be sure to handle the "jail" edge case where the ghost is eaten
+        # and noisyDistance is None
+        for p in self.legalPositions:
+            trueDistance = util.manhattanDistance(p, pacmanPosition)
+            if noisyDistance == None:
                 allPossible[p] = emissionModel[self.getJailPosition()]
-        else:
-            # Replace this code with a correct observation update
-            # Be sure to handle the "jail" edge case where the ghost is eaten
-            # and noisyDistance is None
-            for p in self.legalPositions:
-                trueDistance = util.manhattanDistance(p, pacmanPosition)
-                if emissionModel[trueDistance] > 0:
-                    allPossible[p] += self.beliefs[p] + emissionModel[trueDistance]
+            elif emissionModel[trueDistance] > 0:
+                allPossible[p] += self.beliefs[p] * emissionModel[trueDistance]
         #util.raiseNotDefined()
         "*** END YOUR CODE HERE ***"
 
