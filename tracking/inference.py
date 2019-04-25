@@ -150,16 +150,15 @@ class ExactInference(InferenceModule):
 
         "*** YOUR CODE HERE ***"
         allPossible = util.Counter()
-        # Replace this code with a correct observation update
-        # Be sure to handle the "jail" edge case where the ghost is eaten
-        # and noisyDistance is None
         for p in self.legalPositions:
             trueDistance = util.manhattanDistance(p, pacmanPosition)
             if noisyDistance == None:
-                allPossible[p] = emissionModel[self.getJailPosition()]
-            elif emissionModel[trueDistance] > 0:
+                allPossible[p] = 0
+            else:
                 allPossible[p] += self.beliefs[p] * emissionModel[trueDistance]
         #util.raiseNotDefined()
+        if noisyDistance == None:
+            allPossible[self.getJailPosition()] = 1
         "*** END YOUR CODE HERE ***"
 
         allPossible.normalize()
