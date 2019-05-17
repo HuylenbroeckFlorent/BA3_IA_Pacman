@@ -21,7 +21,7 @@ import re
 import sys
 import projectParams
 import random
-random.seed(0)
+random.seed(0, version=1)
 try: 
     from pacman import GameState
 except:

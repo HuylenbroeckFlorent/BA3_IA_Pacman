@@ -295,7 +295,11 @@ class Actions:
                    Directions.WEST:  (-1, 0),
                    Directions.STOP:  (0, 0)}
 
-    _directionsAsList = list(_directions.items())
+    _directionsAsList = [('West', (-1, 0)),
+                         ('Stop', (0, 0)),
+                         ('East', (1, 0)),
+                         ('North', (0, 1)),
+                         ('South', (0, -1))]
 
     TOLERANCE = .001
 
