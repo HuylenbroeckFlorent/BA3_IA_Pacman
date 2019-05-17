@@ -350,19 +350,19 @@ def betterEvaluationFunction(currentGameState):
 			aggressiveGhosts.append(ghost)
 
 	# closest aggressive ghost
-	closestGhost = closestFromList(pos, [ghost.getPosition() for ghost in aggressiveGhosts])
+	closestGhost = max(3, closestFromList(pos, [ghost.getPosition() for ghost in aggressiveGhosts]))
 
 	# closest scared ghost
 	closestScaredGhost = closestFromList(pos, [ghost.getPosition() for ghost in scaredGhosts])
 
 	evaluation = 0
-	evaluation += score # Takes too long without accounting score
-	evaluation += -closestFood # Best coef seems to be 1
+	evaluation += 3*score # Takes too long without accounting score
+	evaluation += -closestFood*3 # Best coef seems to be 1
 	#evaluation += -closestCapsule # This ruins everything
-	evaluation += closestGhost # Helps with speed
+	evaluation += -nfood*5
+	evaluation += -ncapsules*10 # This with high coef really helps.
+	evaluation *= (1/closestGhost)# Helps with speed
 	#evaluation += closestScaredGhost # Seems to be better ignoring em
-	evaluation += -nfood*3
-	evaluation += -ncapsules*29 # This with high coef really helps.
 
 	return evaluation
 
